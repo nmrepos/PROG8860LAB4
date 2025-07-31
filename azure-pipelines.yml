@@ -7,12 +7,14 @@ stages:
         pool:
           name: 'default'
         steps:
-          # Python is pre-installed on the self-hosted agent
+          # Ensure Python 3.12 is installed using Chocolatey (Windows only)
           - script: |
-              py --version
-              py -m pip install --upgrade pip
-              py -m pip install -r requirements.txt
-            displayName: 'Install dependencies'
+              choco install python --version=3.12.1 -y
+              refreshenv
+              python --version
+              python -m pip install --upgrade pip
+              python -m pip install -r requirements.txt
+            displayName: 'Install and setup Python dependencies'
 
   - stage: Test
     displayName: 'Test Stage'
