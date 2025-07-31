@@ -3,19 +3,18 @@ stages:
     displayName: 'Build Stage'
     jobs:
       - job: Build
-        displayName: 'Build the Function App'
+        displayName: 'Build the Python Function App'
         pool:
           name: 'default'
         steps:
-          - task: UseDotNet@2
+          - task: UsePythonVersion@0
             inputs:
-              packageType: 'sdk'
-              version: '5.x'
-              installationPath: $(Agent.ToolsDirectory)/dotnet
+              versionSpec: '3.11'
+              addToPath: true
           - script: |
-              dotnet restore FunctionApp/FunctionApp.csproj
-              dotnet build FunctionApp/FunctionApp.csproj --configuration Release
-            displayName: 'Build the Azure Function'
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt
+            displayName: 'Install dependencies'
 
   - stage: Test
     displayName: 'Test Stage'
@@ -23,22 +22,23 @@ stages:
       - job: Test
         displayName: 'Run Unit Tests'
         pool:
-          name: 'default'  # Use the default pool or specify a custom one
+          name: 'default'
         steps:
           - script: |
-              dotnet test FunctionApp.Tests/FunctionApp.Tests.csproj --configuration Release
-            displayName: 'Run Tests'
+              pip install pytest
+              pytest
+            displayName: 'Run Pytest'
 
   - stage: Deploy
     displayName: 'Deploy to Azure'
     jobs:
       - job: Deploy
-        displayName: 'Deploy Function to Azure'
+        displayName: 'Deploy Python Function to Azure'
         pool:
           name: 'default'
         steps:
           - task: AzureFunctionApp@1
             inputs:
               azureSubscription: 'azuredev'  # Azure service connection name
-              appName: 'ict4nm'            # Actual Azure Function App name
-              package: '$(Build.ArtifactStagingDirectory)/**/*.zip'
+              appName: 'ict4nmnm'              # Actual Azure Function App name
+              package: '$(System.DefaultWorkingDirectory)'
