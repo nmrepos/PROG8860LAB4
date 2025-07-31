@@ -5,7 +5,7 @@ stages:
       - job: Build
         displayName: 'Build the Function App'
         pool:
-          vmImage: 'windows-latest'
+          name: 'default'
         steps:
           - task: UseDotNet@2
             inputs:
@@ -23,7 +23,7 @@ stages:
       - job: Test
         displayName: 'Run Unit Tests'
         pool:
-          vmImage: 'windows-latest'
+          name: 'default'  # Use the default pool or specify a custom one
         steps:
           - script: |
               dotnet test --configuration Release
@@ -35,7 +35,7 @@ stages:
       - job: Deploy
         displayName: 'Deploy Function to Azure'
         pool:
-          vmImage: 'windows-latest'
+          name: 'default'
         steps:
           - task: AzureFunctionApp@1
             inputs:
