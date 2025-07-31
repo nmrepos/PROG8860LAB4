@@ -39,6 +39,6 @@ stages:
         steps:
           - task: AzureFunctionApp@1
             inputs:
-              azureSubscription: 'nmnm'  # Azure service connection name
-              appName: 'nm'            # Actual Azure Function App name
+              azureSubscription: 'azuredev'  # Azure service connection name
+              appName: 'ict4nm'            # Actual Azure Function App name
               package: '$(Build.ArtifactStagingDirectory)/**/*.zip'
