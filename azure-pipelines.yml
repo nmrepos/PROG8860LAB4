@@ -39,6 +39,6 @@ stages:
         steps:
           - task: AzureFunctionApp@1
             inputs:
-              azureSubscription: 'nmrepos'  # Replace with your Azure service connection name
-              appName: 'myAzureFunctionApp'              # Replace with your Azure Function App name
+              azureSubscription: 'nmrepos'  # Azure service connection name
+              appName: 'ict4'               # Actual Azure Function App name
               package: '$(Build.ArtifactStagingDirectory)/**/*.zip'
