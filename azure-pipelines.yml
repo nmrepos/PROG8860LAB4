@@ -9,9 +9,9 @@ stages:
         steps:
           # Python is pre-installed on the self-hosted agent
           - script: |
-              python3 --version
-              python3 -m pip install --upgrade pip
-              python3 -m pip install -r requirements.txt
+              py --version
+              py -m pip install --upgrade pip
+              py -m pip install -r requirements.txt
             displayName: 'Install dependencies'
 
   - stage: Test
