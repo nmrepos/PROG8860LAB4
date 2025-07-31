@@ -13,8 +13,8 @@ stages:
               version: '5.x'
               installationPath: $(Agent.ToolsDirectory)/dotnet
           - script: |
-              dotnet restore
-              dotnet build --configuration Release
+              dotnet restore FunctionApp/FunctionApp.csproj
+              dotnet build FunctionApp/FunctionApp.csproj --configuration Release
             displayName: 'Build the Azure Function'
 
   - stage: Test
@@ -26,7 +26,7 @@ stages:
           name: 'default'  # Use the default pool or specify a custom one
         steps:
           - script: |
-              dotnet test --configuration Release
+              dotnet test FunctionApp.Tests/FunctionApp.Tests.csproj --configuration Release
             displayName: 'Run Tests'
 
   - stage: Deploy
