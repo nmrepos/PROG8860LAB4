@@ -7,10 +7,7 @@ stages:
         pool:
           name: 'default'
         steps:
-          - task: UsePythonVersion@0
-            inputs:
-              versionSpec: '3.10'
-              addToPath: true
+          # Python is pre-installed on the self-hosted agent
           - script: |
               python -m pip install --upgrade pip
               pip install -r requirements.txt
