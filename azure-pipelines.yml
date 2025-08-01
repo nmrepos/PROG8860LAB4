@@ -11,8 +11,6 @@ stages:
           name: 'default'
         steps:
           - script: |
-              choco install python --version=3.12.1 -y --no-progress
-              refreshenv
               python --version
               python -m pip install --upgrade pip
               python -m pip install -r requirements.txt
