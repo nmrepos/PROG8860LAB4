@@ -1,4 +1,4 @@
-import app
+from HelloWorld import app
 import azure.functions as func
 
 def test_main():
