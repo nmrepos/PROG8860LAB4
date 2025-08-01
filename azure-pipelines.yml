@@ -1,47 +1,54 @@
+trigger:
+  - main
+
+pool:
+  vmImage: 'windows-latest'
+
 stages:
   - stage: Build
-    displayName: 'Build Stage'
     jobs:
       - job: Build
-        displayName: 'Build the Python Function App'
-        pool:
-          name: 'default'
         steps:
-          # Ensure Python 3.12 is installed using Chocolatey (Windows only)
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.12'
           - script: |
-              choco install python --version=3.12.1 -y
-              refreshenv
               python --version
-              python -m pip install --upgrade pip
-              python -m pip install -r requirements.txt
+              pip install --upgrade pip
+              pip install -r requirements.txt
             displayName: 'Install and setup Python dependencies'
+          - task: ArchiveFiles@2
+            inputs:
+              rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/function.zip'
+              replaceExistingArchive: true
+          - publish: '$(Build.ArtifactStagingDirectory)/function.zip'
+            artifact: drop
 
   - stage: Test
-    displayName: 'Test Stage'
+    dependsOn: Build
     jobs:
       - job: Test
-        displayName: 'Run Unit Tests'
-        pool:
-          name: 'default'
         steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.12'
           - script: |
-              choco install python --version=3.12.1 -y
-              refreshenv
-              python --version
-              python -m pip install pytest
+              pip install pytest
               pytest
             displayName: 'Run Pytest'
 
   - stage: Deploy
-    displayName: 'Deploy to Azure'
+    dependsOn: Build
     jobs:
       - job: Deploy
-        displayName: 'Deploy Python Function to Azure'
-        pool:
-          name: 'default'
         steps:
+          - download: current
+            artifact: drop
           - task: AzureFunctionApp@1
             inputs:
-              azureSubscription: 'azuredev'  # Azure service connection name
-              appName: 'ict4nmnm'              # Actual Azure Function App name
-              package: '$(System.DefaultWorkingDirectory)'
+              azureSubscription: 'azuredev'
+              appName: 'ict4nmnm'
+              package: '$(Pipeline.Workspace)/drop/function.zip'
