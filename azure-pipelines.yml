@@ -25,6 +25,9 @@ stages:
           name: 'default'
         steps:
           - script: |
+              choco install python --version=3.12.1 -y
+              refreshenv
+              python --version
               python -m pip install pytest
               pytest
             displayName: 'Run Pytest'
