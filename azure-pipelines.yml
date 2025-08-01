@@ -1,53 +1,68 @@
 trigger:
   - main
 
-pool:
-  name: 'default'
-
 stages:
   - stage: Build
+    displayName: 'Build Stage'
     jobs:
       - job: Build
+        displayName: 'Build the Python Function App'
+        pool:
+          name: 'default'
         steps:
-          - task: UsePythonVersion@0
-            inputs:
-              versionSpec: '3.12'
           - script: |
+              choco install python --version=3.12.1 -y --no-progress
+              refreshenv
               python --version
-              pip install --upgrade pip
-              pip install -r requirements.txt
+              python -m pip install --upgrade pip
+              python -m pip install -r requirements.txt
             displayName: 'Install and setup Python dependencies'
+
           - task: ArchiveFiles@2
+            displayName: 'Archive function app'
             inputs:
               rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
               includeRootFolder: false
               archiveType: 'zip'
               archiveFile: '$(Build.ArtifactStagingDirectory)/function.zip'
               replaceExistingArchive: true
+
           - publish: '$(Build.ArtifactStagingDirectory)/function.zip'
             artifact: drop
 
   - stage: Test
+    displayName: 'Test Stage'
     dependsOn: Build
     jobs:
       - job: Test
+        displayName: 'Run Unit Tests'
+        pool:
+          name: 'default'
         steps:
-          - task: UsePythonVersion@0
-            inputs:
-              versionSpec: '3.12'
           - script: |
-              pip install pytest
+              choco install python --version=3.12.1 -y --no-progress
+              refreshenv
+              python --version
+              python -m pip install --upgrade pip
+              python -m pip install -r requirements.txt
+              python -m pip install pytest
               pytest
             displayName: 'Run Pytest'
 
   - stage: Deploy
-    dependsOn: Build
+    displayName: 'Deploy to Azure'
+    dependsOn: Test
     jobs:
       - job: Deploy
+        displayName: 'Deploy Python Function to Azure'
+        pool:
+          name: 'default'
         steps:
           - download: current
             artifact: drop
+
           - task: AzureFunctionApp@1
+            displayName: 'Deploy to Azure Functions'
             inputs:
               azureSubscription: 'azuredev'
               appName: 'ict4nmnm'
